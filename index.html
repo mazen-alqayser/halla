@@ -378,8 +378,71 @@
     .features-bg{background:linear-gradient(rgba(251,247,242,.94),rgba(251,247,242,.94)),url('https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/c05e448cd09d.png');background-size:cover;background-position:center;background-attachment:scroll}
     @media(min-width:992px){.hero-bg,.cta-banner,.features-bg{background-attachment:fixed}}
 
+
+    /* إخفاء بطاقات المعرض بعد العاشرة */
+#designsGallery .col-6.col-md-4.col-lg-3.gm-hidden { display: none !important; }
+#showMoreWrap.gm-hidden { display: none !important; }
+
+    
   </style>
 </head>
+  <script>
+(function () {
+  var gallery = document.getElementById('designsGallery');
+  if (!gallery) return;
+  var allCards = gallery.querySelectorAll('.col-6.col-md-4.col-lg-3');
+  var total = allCards.length;
+  var shown = 10;       // أول 10 تظهر مباشرة
+  var STEP = 10;        // كل ضغطة تكشف 10 جديدة
+
+  // إخفاء كل البطاقات بعد العاشرة
+  for (var i = shown; i < total; i++) {
+    allCards[i].classList.add('gm-hidden');
+  }
+
+  function updateCounter() {
+    var counter = document.getElementById('galleryCounter');
+    if (!counter) return;
+    var remaining = total - shown;
+    if (remaining > 0) {
+      counter.textContent = 'تم عرض ' + shown + ' من ' + total + ' تصميم — تبقّى ' + remaining;
+    } else {
+      counter.textContent = 'تم عرض جميع التصاميم (' + total + ' تصميم)';
+    }
+  }
+
+  function refresh() {
+    updateCounter();
+    var wrap = document.getElementById('showMoreWrap');
+    if (!wrap) return;
+    if (total - shown <= 0) {
+      wrap.classList.add('gm-hidden');
+    } else {
+      wrap.classList.remove('gm-hidden');
+    }
+  }
+
+  var btn = document.getElementById('showMoreBtn');
+  if (btn) {
+    btn.addEventListener('click', function () {
+      var revealed = 0;
+      for (var i = 0; i < total && revealed < STEP; i++) {
+        var c = allCards[i];
+        if (c.classList.contains('gm-hidden')) {
+          c.classList.remove('gm-hidden');
+          revealed++;
+          shown++;
+        }
+      }
+      // تحديث AOS للحركات الجديدة
+      if (typeof AOS !== 'undefined') { try { AOS.refreshHard(); } catch (e) { AOS.refresh(); } }
+      refresh();
+    });
+  }
+
+  refresh();
+})();
+</script>
 <body class="preloading">
 
   <div class="preloader" id="preloader">
@@ -755,6 +818,14 @@
         <div class="col-6 col-md-4 col-lg-3" data-aos="zoom-in" data-aos-delay="0"><div class="empty-slot" style="height:320px;"><i class="fa-solid fa-plus"></i><h6 class="fw-bold mb-1">تصميم قادم</h6><p class="mb-0 small" style="color:#a89072;">قريبا</p></div></div>
 
       </div>
+      
+      <!-- زر عرض المزيد + العداد -->
+<div class="text-center mt-5" id="showMoreWrap">
+  <p class="mb-3 small" id="galleryCounter" style="color:#8a7a70;"></p>
+  <button class="btn-luxury" id="showMoreBtn" type="button">
+    <span><i class="fa-solid fa-circle-plus ms-2"></i>عرض المزيد من التصاميم</span>
+  </button>
+</div>
       <div class="text-center mt-5" data-aos="fade-up"><a href="https://wa.me/966508390242" target="_blank" rel="noopener" class="btn-whatsapp"><i class="fa-brands fa-whatsapp"></i> اطلبي تصميماً مخصصاً لمطبخكِ</a></div>
     </div>
   </section>
